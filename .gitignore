@@ -2,3 +2,4 @@
 
 examples/
 database/.env
+database/__pycache__

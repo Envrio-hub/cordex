@@ -7,13 +7,14 @@ from pydantic import BaseModel, condecimal
 from databases_companion.enum_variables import AccountType
 from typing import Annotated
 from decimal import Decimal
+from datetime import datetime
 
 # Base Models
 class UsersBase(BaseModel):
     aws_user_name: str
     email: str
     account_type: AccountType
-    subscription_expires_in: float
+    subscription_expires_in: datetime
 
 class ProjectedParametersBase(BaseModel):
     longitude: Annotated[Decimal, condecimal(max_digits=10, decimal_places=6)]

@@ -17,7 +17,7 @@ class User:
     @staticmethod
     @data_base_decorators.session_handler_add_delete_update
     def add(new_user: schemas.UsersBaseCreate, db: Session = None):
-        new_user = models.Users(aws_user_name=new_user.aws_user_name, email=new_user.email, account_type=new_user.account_type, subscritpion_expires_in=new_user.subscription_expires_in)
+        new_user = models.Users(aws_user_name=new_user.aws_user_name, email=new_user.email, account_type=new_user.account_type, subscription_expires_in=new_user.subscription_expires_in)
         db.add(new_user)
     
     @staticmethod
