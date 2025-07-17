@@ -1,5 +1,7 @@
 .gitignore
+alembic.ini
 
+migrations/
 examples/
 database/.env
 database/__pycache__
