@@ -16,13 +16,14 @@ class UsersBase(BaseModel):
     account_type: AccountType
     subscription_expires_in: datetime
 
-class ProjectedParametersBase(BaseModel):
+class VariablesMetadataBase(BaseModel):
     longitude: Annotated[Decimal, condecimal(max_digits=10, decimal_places=6)]
     latitude: Annotated[Decimal, condecimal(max_digits=10, decimal_places=6)]
     global_model: str
     regional_model: str
     rcp_scenario: str
-    parameter: str
+    ensemble: str
+    variable: str
 
 # Create Models
 class UsersBaseCreate(UsersBase):

@@ -21,8 +21,8 @@ class Users(Base):
     account_type: Mapped[AccountType] = mapped_column(SQLAlchemyEnum(AccountType), nullable=False)
     subscription_expires_in: Mapped[datetime] = mapped_column(DateTime, nullable=False)
 
-class LocationProjection(Base):
-    __tablename__ = 'projected_parameters'
+class VariablesMetadata(Base):
+    __tablename__ = 'variables_metadata'
     
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     longitude: Mapped[float] = mapped_column(Numeric(10,6), nullable=False)
@@ -30,7 +30,8 @@ class LocationProjection(Base):
     global_model: Mapped[str] = mapped_column(String(50), nullable=False)
     regional_model: Mapped[str] = mapped_column(String(50), nullable=False)
     rcp_scenario: Mapped[str] = mapped_column(String(50), nullable=False)
-    parameter: Mapped[str] = mapped_column(String(50), nullable=False)
+    ensemble: Mapped[str] = mapped_column(String(50), nullable=False)
+    variable: Mapped[str] = mapped_column(String(50), nullable=False)
 
     __table_args__ = (
         Index('idx_coordinates', 'longitude', 'latitude'),
