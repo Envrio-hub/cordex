@@ -1,7 +1,7 @@
-__version__='0.1.0'
+__version__='0.1.2'
 __author__=['Ioannis Tsakmakis']
 __date_created__='2025-06-30'
-__last_updated__='2025-06-30'
+__last_updated__='2025-07-22'
 
 from pydantic import BaseModel, condecimal
 from databases_companion.enum_variables import AccountType
@@ -16,15 +16,44 @@ class UsersBase(BaseModel):
     account_type: AccountType
     subscription_expires_in: datetime
 
-class VariablesMetadataBase(BaseModel):
+class ProjectionAttributesBase(BaseModel):
+    CORDEX_domain: str
+    global_climate_model: str
+    regional_climate_model: str
+    experiment_id: str
+    ensemble: str
+    creation_date: datetime
+    starting_date: datetime
+    ending_date: datetime
+
+class LocationsBase(BaseModel):
     longitude: Annotated[Decimal, condecimal(max_digits=10, decimal_places=6)]
     latitude: Annotated[Decimal, condecimal(max_digits=10, decimal_places=6)]
-    global_model: str
-    regional_model: str
-    rcp_scenario: str
-    ensemble: str
-    variable: str
+    elevation: int
+
+class VariablesBase(BaseModel):
+    projection_id: int
+    standard_name: str
+    long_name: str
+    units: str
+
+class DataMappingBase(BaseModel):
+    location_id: int
+    variable_id: int
+    projection_id: int
 
 # Create Models
-class UsersBaseCreate(UsersBase):
+class UsersCreate(UsersBase):
+    pass
+
+class ProjectionAttributesCreate(ProjectionAttributesBase):
+    pass
+
+class LocationsCreate(LocationsBase):
+    pass
+
+class VariablesCreate(VariablesBase):
+    pass
+
+class DataMappingCreate(DataMappingBase):
     pass
