@@ -58,9 +58,9 @@ class ProjectionAttributes():
     @staticmethod
     @data_base_decorators.session_handler_query
     @data_type_validator.validate_str('global_climate_model','regional_climate_model','CORDEX_domain','experiment_id','ensemble')
-    def get_by_gcm_rcm_CD_expID_ens(global_climate_model: str, regional_climatte_model: str, CORDEX_domain: str, experiment_id: str, ensemble: str, db: Session = None):
+    def get_by_gcm_rcm_CD_expID_ens(global_climate_model: str, regional_climate_model: str, CORDEX_domain: str, experiment_id: str, ensemble: str, db: Session = None):
         result = db.execute(select(models.ProjectionAttributes).filter(models.ProjectionAttributes.global_climate_model==global_climate_model,
-                                                                       models.ProjectionAttributes.regional_climate_model==regional_climatte_model,
+                                                                       models.ProjectionAttributes.regional_climate_model==regional_climate_model,
                                                                        models.ProjectionAttributes.CORDEX_domain==CORDEX_domain,
                                                                        models.ProjectionAttributes.experiment_id==experiment_id,
                                                                        models.ProjectionAttributes.ensemble==ensemble)).scalars()
