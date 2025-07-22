@@ -3,9 +3,9 @@ __author__=['Ioannis Tsakmakis']
 __date_created__='2025-06-30'
 __last_updated__='2025-07-22'
 
-from database import models, schemas, engine
+from cordex_database import models, schemas, engine
 from sqlalchemy.orm import Session
-from sqlalchemy import select, update
+from sqlalchemy import select
 from geoalchemy2.functions import ST_GeomFromText, ST_Distance_Sphere
 from aws_utils.aws_utils import KeyManagementService
 from databases_companion.decorators import DatabaseDecorators, DTypeValidator

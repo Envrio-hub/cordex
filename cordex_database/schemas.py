@@ -9,6 +9,7 @@ from typing import Annotated
 from decimal import Decimal
 from datetime import datetime
 
+
 # Base Models
 class UsersBase(BaseModel):
     aws_user_name: str

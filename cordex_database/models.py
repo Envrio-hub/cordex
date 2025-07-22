@@ -5,12 +5,13 @@ __author__=['Ioannis Tsakmakis']
 __date_created__='2025-06-30'
 __last_updated__='2025-07-22'
 
-from database.engine import Base
+from cordex_database.engine import Base
 from sqlalchemy import Index, UniqueConstraint, ForeignKey, Integer, String, DateTime, Numeric, Enum as SQLAlchemyEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from geoalchemy2 import Geometry
 from databases_companion.enum_variables import AccountType
 from datetime import datetime
+
 
 # Users
 class Users(Base):
