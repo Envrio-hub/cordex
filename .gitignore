@@ -3,5 +3,5 @@ alembic.ini
 
 migrations/
 examples/
-database/.env
+codex_database/.env
 database/__pycache__
