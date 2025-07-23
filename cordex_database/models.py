@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-__version__='0.1.3'
+__version__='0.1.4'
 __author__=['Ioannis Tsakmakis']
 __date_created__='2025-06-30'
-__last_updated__='2025-07-22'
+__last_updated__='2025-07-23'
 
 from cordex_database.engine import Base
 from sqlalchemy import Index, UniqueConstraint, ForeignKey, Integer, String, DateTime, Numeric, Enum as SQLAlchemyEnum
@@ -33,8 +33,8 @@ class ProjectionAttributes(Base):
     experiment_id: Mapped[str] = mapped_column(String(50), nullable=False)
     ensemble: Mapped[str] = mapped_column(String(50), nullable=False)
     creation_date: Mapped[datetime] = mapped_column(DateTime, nullable=False)
-    starting_date: Mapped[datetime]= mapped_column(DateTime, nullable=False)
-    ending_date: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    starting_date: Mapped[datetime]= mapped_column(DateTime, nullable=True)
+    ending_date: Mapped[datetime] = mapped_column(DateTime, nullable=True)
 
 class Locations(Base):
     __tablename__ = 'locations'

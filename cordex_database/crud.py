@@ -92,6 +92,17 @@ class Locations:
             .first()
         )
         return nearest
+    
+    @staticmethod
+    @data_base_decorators.session_handler_query
+    @data_type_validator.validate_decimal('longitude','latitude')
+    def check_registration_status(longitude: float, latitude: float, db: Session = None):
+        check_result = db.execute(select(models.Locations).filter(models.Locations.latitude==latitude,
+                                                                  models.Locations.longitude==longitude)).scalars().first()
+        if check_result:
+            return {"message":"coordinate pair already registered"}
+        else:
+            None
 
 class Variables:
 
@@ -113,6 +124,18 @@ class Variables:
     def get_by_projection_id(projection_id: int, db: Session = None):
         return db.execute(select(models.Variables).filter_by(projection_id=projection_id)).scalars().all()
     
+    @staticmethod
+    @data_base_decorators.session_handler_query
+    @data_type_validator.validate_int('projection_id')
+    @data_type_validator.validate_str('standard_name')
+    def get_by_projection_id_and_standard_name(projection_id: int, standard_name: str, db: Session = None):
+        result = db.execute(select(models.Variables).filter(models.Variables.projection_id==projection_id,
+                                                            models.Variables.standard_name==standard_name)).scalars().first()
+        if result:
+            return result
+        else:
+            None
+
     @staticmethod
     @data_base_decorators.session_handler_add_delete_update
     @data_type_validator.validate_str('standard_name')

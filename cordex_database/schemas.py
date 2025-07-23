@@ -1,11 +1,11 @@
-__version__='0.1.2'
+__version__='0.1.3'
 __author__=['Ioannis Tsakmakis']
 __date_created__='2025-06-30'
-__last_updated__='2025-07-22'
+__last_updated__='2025-07-23'
 
 from pydantic import BaseModel, condecimal
 from databases_companion.enum_variables import AccountType
-from typing import Annotated
+from typing import Annotated, Optional
 from decimal import Decimal
 from datetime import datetime
 
@@ -24,8 +24,8 @@ class ProjectionAttributesBase(BaseModel):
     experiment_id: str
     ensemble: str
     creation_date: datetime
-    starting_date: datetime
-    ending_date: datetime
+    starting_date: Optional[datetime] = None
+    ending_date: Optional[datetime] = None
 
 class LocationsBase(BaseModel):
     longitude: Annotated[Decimal, condecimal(max_digits=10, decimal_places=6)]
