@@ -63,9 +63,11 @@ class ProjectionAttributes():
                                                                        models.ProjectionAttributes.regional_climate_model==regional_climate_model,
                                                                        models.ProjectionAttributes.CORDEX_domain==CORDEX_domain,
                                                                        models.ProjectionAttributes.experiment_id==experiment_id,
-                                                                       models.ProjectionAttributes.ensemble==ensemble)).scalars()
+                                                                       models.ProjectionAttributes.ensemble==ensemble)).scalars().first()
         if result:
             return result
+        else:
+            return None
 
 class Locations:
 
