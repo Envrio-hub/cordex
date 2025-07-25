@@ -1,7 +1,7 @@
-__version__='0.1.3'
+__version__='0.1.4'
 __author__=['Ioannis Tsakmakis']
 __date_created__='2025-06-30'
-__last_updated__='2025-07-23'
+__last_updated__='2025-07-24'
 
 from pydantic import BaseModel, condecimal
 from databases_companion.enum_variables import AccountType
@@ -30,7 +30,7 @@ class ProjectionAttributesBase(BaseModel):
 class LocationsBase(BaseModel):
     longitude: Annotated[Decimal, condecimal(max_digits=10, decimal_places=6)]
     latitude: Annotated[Decimal, condecimal(max_digits=10, decimal_places=6)]
-    elevation: int
+    elevation: Optional[int] = None
 
 class VariablesBase(BaseModel):
     projection_id: int

@@ -1,7 +1,7 @@
-__version__='0.1.1'
+__version__='0.1.3'
 __author__=['Ioannis Tsakmakis']
 __date_created__='2025-06-30'
-__last_updated__='2025-07-22'
+__last_updated__='2025-07-24'
 
 from cordex_database import models, schemas, engine
 from sqlalchemy.orm import Session
@@ -59,15 +59,11 @@ class ProjectionAttributes():
     @data_base_decorators.session_handler_query
     @data_type_validator.validate_str('global_climate_model','regional_climate_model','CORDEX_domain','experiment_id','ensemble')
     def get_by_gcm_rcm_CD_expID_ens(global_climate_model: str, regional_climate_model: str, CORDEX_domain: str, experiment_id: str, ensemble: str, db: Session = None):
-        result = db.execute(select(models.ProjectionAttributes).filter(models.ProjectionAttributes.global_climate_model==global_climate_model,
+        return db.execute(select(models.ProjectionAttributes).filter(models.ProjectionAttributes.global_climate_model==global_climate_model,
                                                                        models.ProjectionAttributes.regional_climate_model==regional_climate_model,
                                                                        models.ProjectionAttributes.CORDEX_domain==CORDEX_domain,
                                                                        models.ProjectionAttributes.experiment_id==experiment_id,
                                                                        models.ProjectionAttributes.ensemble==ensemble)).scalars().first()
-        if result:
-            return result
-        else:
-            return None
 
 class Locations:
 
@@ -97,12 +93,8 @@ class Locations:
     @data_base_decorators.session_handler_query
     @data_type_validator.validate_decimal('longitude','latitude')
     def check_registration_status(longitude: float, latitude: float, db: Session = None):
-        check_result = db.execute(select(models.Locations).filter(models.Locations.latitude==latitude,
+        return db.execute(select(models.Locations).filter(models.Locations.latitude==latitude,
                                                                   models.Locations.longitude==longitude)).scalars().first()
-        if check_result:
-            return {"message":"coordinate pair already registered"}
-        else:
-            None
 
 class Variables:
 
@@ -111,6 +103,12 @@ class Variables:
     def add(new_variable: schemas.VariablesCreate, db: Session = None):
         new_variable = models.Variables(projection_id=new_variable.projection_id, standard_name=new_variable.standard_name, long_name=new_variable.long_name, units=new_variable.units)
         db.add(new_variable)
+
+    @staticmethod
+    @data_base_decorators.session_handler_query
+    @data_type_validator.validate_int('variable_id')
+    def get_by_variable_id(variable_id: int, db: Session = None):
+        return db.execute(select(models.Variables).filter_by(id=variable_id)).scalars().first()
 
     @staticmethod
     @data_base_decorators.session_handler_query
@@ -129,12 +127,8 @@ class Variables:
     @data_type_validator.validate_int('projection_id')
     @data_type_validator.validate_str('standard_name')
     def get_by_projection_id_and_standard_name(projection_id: int, standard_name: str, db: Session = None):
-        result = db.execute(select(models.Variables).filter(models.Variables.projection_id==projection_id,
+        return db.execute(select(models.Variables).filter(models.Variables.projection_id==projection_id,
                                                             models.Variables.standard_name==standard_name)).scalars().first()
-        if result:
-            return result
-        else:
-            None
 
     @staticmethod
     @data_base_decorators.session_handler_add_delete_update
@@ -173,6 +167,17 @@ class DataMapping:
         variable_id = db.execute(select(models.Variables).filter_by(standard_name=standard_name)).scalars()
         return db.execute(select(models.DataMapping).filter_by(variable_id=variable_id)).scalars()
     
+    @staticmethod
+    @data_base_decorators.session_handler_query
+    @data_type_validator.validate_int('location_id','projection_id','variable_id')
+    def get_by_location_projection_variable_id(location_id: int, projection_id: int, variable_id: int, db: Session = None):
+        result = db.execute(select(models.DataMapping).filter(models.DataMapping.location_id==location_id,
+                                                              models.DataMapping.projection_id==projection_id,
+                                                              models.DataMapping.variable_id==variable_id)).scalars().first()
+        if result:
+            return result
+        return None
+
     @staticmethod
     @data_base_decorators.session_handler_query
     @data_type_validator.validate_int('projection_id')

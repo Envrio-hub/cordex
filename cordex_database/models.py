@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-__version__='0.1.4'
+__version__='0.1.5'
 __author__=['Ioannis Tsakmakis']
 __date_created__='2025-06-30'
-__last_updated__='2025-07-23'
+__last_updated__='2025-07-24'
 
 from cordex_database.engine import Base
 from sqlalchemy import Index, UniqueConstraint, ForeignKey, Integer, String, DateTime, Numeric, Enum as SQLAlchemyEnum
@@ -42,7 +42,7 @@ class Locations(Base):
     id: Mapped[int]= mapped_column(Integer, primary_key=True, autoincrement=True)
     longitude: Mapped[float] = mapped_column(Numeric(10,6), nullable=False)
     latitude: Mapped[float] = mapped_column(Numeric(10,6), nullable=False)
-    elevation: Mapped[int]= mapped_column(Integer)
+    elevation: Mapped[int]= mapped_column(Integer, nullable=True)
     geom: Mapped[Geometry] = mapped_column(Geometry("POINT", srid=4326), nullable=False)
 
     __table_args__ = (
