@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='cordex',
+    name='cordex_database',
     version='0.1.0',
     description='A library that enables cordex database update and access',
     author='Ioannis Tsakmakis',
