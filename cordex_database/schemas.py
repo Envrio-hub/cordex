@@ -1,10 +1,10 @@
-__version__='0.1.4'
+__version__='0.1.5'
 __author__=['Ioannis Tsakmakis']
 __date_created__='2025-06-30'
-__last_updated__='2025-07-24'
+__last_updated__='2025-07-26'
 
 from pydantic import BaseModel, condecimal
-from databases_companion.enum_variables import AccountType
+from databases_companion.enum_variables import AccountType, AggregationFunction, TemporalResolution
 from typing import Annotated, Optional
 from decimal import Decimal
 from datetime import datetime
@@ -33,10 +33,16 @@ class LocationsBase(BaseModel):
     elevation: Optional[int] = None
 
 class VariablesBase(BaseModel):
-    projection_id: int
     standard_name: str
     long_name: str
     units: str
+
+class DataProductsBase(BaseModel):
+    variable_id: int
+    short_name: str
+    aggregation_function: AggregationFunction
+    temporal_resolution: TemporalResolution
+    spatial_resulution: Optional[str] = None
 
 class DataMappingBase(BaseModel):
     location_id: int
@@ -54,6 +60,9 @@ class LocationsCreate(LocationsBase):
     pass
 
 class VariablesCreate(VariablesBase):
+    pass
+
+class DataProductsCreate(DataProductsBase):
     pass
 
 class DataMappingCreate(DataMappingBase):

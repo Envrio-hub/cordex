@@ -1,7 +1,7 @@
-__version__='0.1.3'
+__version__='0.1.4'
 __author__=['Ioannis Tsakmakis']
 __date_created__='2025-06-30'
-__last_updated__='2025-07-24'
+__last_updated__='2025-07-25'
 
 from cordex_database import models, schemas, engine
 from sqlalchemy.orm import Session
@@ -52,8 +52,8 @@ class ProjectionAttributes():
 
     @staticmethod
     @data_base_decorators.session_handler_query
-    def get_all(db: Session = None):
-        return db.execute(select(models.ProjectionAttributes)).scalars().all()
+    def get_all_ids(db: Session = None):
+        return db.execute(select(models.ProjectionAttributes.id)).scalars().all()
 
     @staticmethod
     @data_base_decorators.session_handler_query
@@ -101,8 +101,18 @@ class Variables:
     @staticmethod
     @data_base_decorators.session_handler_add_delete_update
     def add(new_variable: schemas.VariablesCreate, db: Session = None):
-        new_variable = models.Variables(projection_id=new_variable.projection_id, standard_name=new_variable.standard_name, long_name=new_variable.long_name, units=new_variable.units)
+        new_variable = models.Variables(standard_name=new_variable.standard_name, long_name=new_variable.long_name, units=new_variable.units)
         db.add(new_variable)
+
+    @staticmethod
+    @data_base_decorators.session_handler_query
+    def get_all_ids(db: Session = None):
+        return db.execute(select(models.Variables.id)).scalars().all()
+    
+    @staticmethod
+    @data_base_decorators.session_handler_query
+    def get_all_variables(db: Session = None):
+        return db.execute(select(models.Variables)).scalars().all()
 
     @staticmethod
     @data_base_decorators.session_handler_query
@@ -117,20 +127,6 @@ class Variables:
         return db.execute(select(models.Variables).filter_by(standard_name=standard_name)).scalars().all()
     
     @staticmethod
-    @data_base_decorators.session_handler_query
-    @data_type_validator.validate_int('projection_id')
-    def get_by_projection_id(projection_id: int, db: Session = None):
-        return db.execute(select(models.Variables).filter_by(projection_id=projection_id)).scalars().all()
-    
-    @staticmethod
-    @data_base_decorators.session_handler_query
-    @data_type_validator.validate_int('projection_id')
-    @data_type_validator.validate_str('standard_name')
-    def get_by_projection_id_and_standard_name(projection_id: int, standard_name: str, db: Session = None):
-        return db.execute(select(models.Variables).filter(models.Variables.projection_id==projection_id,
-                                                            models.Variables.standard_name==standard_name)).scalars().first()
-
-    @staticmethod
     @data_base_decorators.session_handler_add_delete_update
     @data_type_validator.validate_str('standard_name')
     def delete_by_standard_name(standard_name: str, db: Session = None):
@@ -138,13 +134,30 @@ class Variables:
         if result:
             db.delete(result)
 
+class DataProducts:
+
     @staticmethod
     @data_base_decorators.session_handler_add_delete_update
-    @data_type_validator.validate_int('projection_id')
-    def delete_by_projection_id(projection_id: int, db: Session = None):
-        result = db.execute(select(models.Variables).filter_by(projection_id=projection_id)).scalars().all()
-        if result:
-            db.delete(result)
+    def add(new_data_product: schemas.DataProductsCreate, db: Session = None):
+        new_data_product = models.DataProducts(variable_id=new_data_product.variable_id, short_name=new_data_product.short_name, aggretation_function=new_data_product.aggregation_function,
+                                               temporal_resolution=new_data_product.temporal_resolution, spatial_resolution=new_data_product.spatial_resulution)
+        db.add(new_data_product)
+
+    @staticmethod
+    @data_base_decorators.session_handler_query
+    def get_all_data_products(db: Session = None):
+        return db.execute(select(models.DataProducts)).scalars().all()
+    
+    @staticmethod
+    @data_base_decorators.session_handler_query
+    def get_all_ids(db: Session = None):
+        return db.execute(select(models.DataProducts.id)).scalars().all()
+
+    @staticmethod
+    @data_base_decorators.session_handler_query
+    @data_type_validator.validate_int('variable_id')
+    def get_by_variable_id(variable_id: int, db: Session = None):
+        return db.execute(select(models.DataProducts).filter_by(variable_id=variable_id)).scalars().all()
 
 class DataMapping:
 
@@ -153,6 +166,11 @@ class DataMapping:
     def add_new_entry(new_netry: schemas.DataMappingCreate, db: Session = None):
         new_netry = models.DataMapping(location_id=new_netry.location_id, variable_id=new_netry.variable_id, projection_id=new_netry.projection_id)
         db.add(new_netry)
+
+    @staticmethod
+    @data_base_decorators.session_handler_query
+    def get_all_ids(db: Session = None):
+        return db.execute(select(models.DataMapping.id)).scalars().all()
 
     @staticmethod
     @data_base_decorators.session_handler_query
