@@ -9,6 +9,7 @@ from sqlalchemy import select
 from geoalchemy2.functions import ST_GeomFromText, ST_Distance_Sphere
 from aws_utils.aws_utils import KeyManagementService
 from databases_companion.decorators import DatabaseDecorators, DTypeValidator
+from databases_companion.enum_variables import TemporalResolution, AggregationFunction
 
 data_base_decorators = DatabaseDecorators(SessionLocal=engine.SessionLocal, Session=Session)
 data_type_validator = DTypeValidator()
@@ -158,6 +159,17 @@ class DataProducts:
     @data_type_validator.validate_int('variable_id')
     def get_by_variable_id(variable_id: int, db: Session = None):
         return db.execute(select(models.DataProducts).filter_by(variable_id=variable_id)).scalars().all()
+    
+    @staticmethod
+    @data_base_decorators.session_handler_query
+    @data_type_validator.validate_int('variable_id')
+    @data_type_validator.validate_str('short_name','spacial_resolution')
+    def get_by_all(variable_id: int, short_name: str, aggregation_function: AggregationFunction, temporal_resolution:TemporalResolution, spatial_resolution: str, db: Session = None):
+        return db.execute(select(models.DataProducts).filter(models.DataProducts.variable_id==variable_id,
+                                                            models.DataProducts.short_name==short_name,
+                                                            models.DataProducts.aggregation_function==aggregation_function,
+                                                            models.DataProducts.temporal_resolution==temporal_resolution,
+                                                            models.DataProducts.spatial_resolution==spatial_resolution)).scalars().first()
 
 class DataMapping:
 
