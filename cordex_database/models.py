@@ -67,7 +67,7 @@ class DataProducts(Base):
     variable_id: Mapped[int] = mapped_column(Integer, ForeignKey(Variables.id), nullable=False)
     short_name: Mapped[str] = mapped_column(String(50), nullable=False)
     aggregation_function: Mapped[AggregationFunction] = mapped_column(SQLAlchemyEnum(AggregationFunction), nullable=False)
-    termporal_resolution: Mapped[TemporalResolution] = mapped_column(SQLAlchemyEnum(TemporalResolution), nullable=False)
+    temporal_resolution: Mapped[TemporalResolution] = mapped_column(SQLAlchemyEnum(TemporalResolution), nullable=False)
     spatial_resolution: Mapped[str] = mapped_column(String(20), nullable=True)
 
 class DataMapping(Base):
@@ -76,13 +76,13 @@ class DataMapping(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     projection_id: Mapped[int] = mapped_column(Integer, ForeignKey(ProjectionAttributes.id), nullable=False)
     location_id: Mapped[int] = mapped_column(Integer, ForeignKey(Locations.id), nullable=False)
-    data_product_id: Mapped[int] = mapped_column(Integer, ForeignKey(Variables.id), nullable=False)
+    data_product_id: Mapped[int] = mapped_column(Integer, ForeignKey(DataProducts.id), nullable=False)
 
     __table_args__ = (
-        UniqueConstraint("projection_id", "location_id", "data_products_id", name="uq_proj_loc_dp"),
+        UniqueConstraint("projection_id", "location_id", "data_product_id", name="uq_proj_loc_dp"),
     )
 
     # Relationships (for ORM-style access)
     location = relationship("Locations")
-    variable = relationship("Variables")
+    data_product = relationship("DataProducts")
     projection = relationship("ProjectionAttributes")
