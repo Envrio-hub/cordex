@@ -1,7 +1,7 @@
-__version__='0.1.5'
+__version__='0.1.6'
 __author__=['Ioannis Tsakmakis']
 __date_created__='2025-06-30'
-__last_updated__='2025-07-26'
+__last_updated__='2025-07-28'
 
 from pydantic import BaseModel, condecimal
 from databases_companion.enum_variables import AccountType, AggregationFunction, TemporalResolution
@@ -45,9 +45,9 @@ class DataProductsBase(BaseModel):
     spatial_resulution: Optional[str] = None
 
 class DataMappingBase(BaseModel):
-    location_id: int
-    variable_id: int
     projection_id: int
+    location_id: int
+    data_product_id: int
 
 # Create Models
 class UsersCreate(UsersBase):

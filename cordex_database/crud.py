@@ -1,7 +1,7 @@
-__version__='0.1.4'
+__version__='0.1.5'
 __author__=['Ioannis Tsakmakis']
 __date_created__='2025-06-30'
-__last_updated__='2025-07-25'
+__last_updated__='2025-07-28'
 
 from cordex_database import models, schemas, engine
 from sqlalchemy.orm import Session
@@ -164,7 +164,7 @@ class DataMapping:
     @staticmethod
     @data_base_decorators.session_handler_add_delete_update
     def add_new_entry(new_netry: schemas.DataMappingCreate, db: Session = None):
-        new_netry = models.DataMapping(location_id=new_netry.location_id, variable_id=new_netry.variable_id, projection_id=new_netry.projection_id)
+        new_netry = models.DataMapping(projection_id=new_netry.projection_id, location_id=new_netry.location_id, data_product_id=new_netry.data_product_id)
         db.add(new_netry)
 
     @staticmethod
@@ -187,11 +187,11 @@ class DataMapping:
     
     @staticmethod
     @data_base_decorators.session_handler_query
-    @data_type_validator.validate_int('location_id','projection_id','variable_id')
-    def get_by_location_projection_variable_id(location_id: int, projection_id: int, variable_id: int, db: Session = None):
+    @data_type_validator.validate_int('projection_id','location_id','data_product_id')
+    def get_by_location_projection_variable_id(projection_id: int, location_id: int, data_product_id: int, db: Session = None):
         result = db.execute(select(models.DataMapping).filter(models.DataMapping.location_id==location_id,
                                                               models.DataMapping.projection_id==projection_id,
-                                                              models.DataMapping.variable_id==variable_id)).scalars().first()
+                                                              models.DataMapping.data_product_id==data_product_id)).scalars().first()
         if result:
             return result
         return None

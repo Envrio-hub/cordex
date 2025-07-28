@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-__version__='0.1.7'
+__version__='0.1.8'
 __author__=['Ioannis Tsakmakis']
 __date_created__='2025-06-30'
-__last_updated__='2025-07-26'
+__last_updated__='2025-07-28'
 
 from cordex_database.engine import Base
 from sqlalchemy import Index, UniqueConstraint, ForeignKey, Integer, String, DateTime, Numeric, Enum as SQLAlchemyEnum
@@ -74,12 +74,12 @@ class DataMapping(Base):
     __tablename__ = 'data_mapping'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    location_id: Mapped[int] = mapped_column(Integer, ForeignKey(Locations.id), nullable=False)
-    variable_id: Mapped[int] = mapped_column(Integer, ForeignKey(Variables.id), nullable=False)
     projection_id: Mapped[int] = mapped_column(Integer, ForeignKey(ProjectionAttributes.id), nullable=False)
+    location_id: Mapped[int] = mapped_column(Integer, ForeignKey(Locations.id), nullable=False)
+    data_product_id: Mapped[int] = mapped_column(Integer, ForeignKey(Variables.id), nullable=False)
 
     __table_args__ = (
-        UniqueConstraint("location_id", "variable_id", "projection_id", name="uq_loc_var_proj"),
+        UniqueConstraint("projection_id", "location_id", "data_products_id", name="uq_proj_loc_dp"),
     )
 
     # Relationships (for ORM-style access)
