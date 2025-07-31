@@ -9,7 +9,7 @@ from cordex_database.engine import Base
 from sqlalchemy import Index, UniqueConstraint, ForeignKey, Integer, String, DateTime, Numeric, Enum as SQLAlchemyEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from geoalchemy2 import Geometry
-from databases_companion.enum_variables import AccountType, TemporalResolution, AggregationFunction
+from databases_companion.enum_variables import AccountType, TemporalResolution, AggregationFunction, ConfirmationStatus
 from datetime import datetime
 
 
@@ -20,6 +20,7 @@ class Users(Base):
     user_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     aws_user_name: Mapped[str] = mapped_column(String(500), nullable=False)
     email: Mapped[str] = mapped_column(String(500), nullable=False)
+    confirmation_status: Mapped[ConfirmationStatus] = mapped_column(SQLAlchemyEnum(ConfirmationStatus), nullable=False)
     account_type: Mapped[AccountType] = mapped_column(SQLAlchemyEnum(AccountType), nullable=False)
     subscription_expires_in: Mapped[datetime] = mapped_column(DateTime, nullable=False)
 
@@ -56,7 +57,7 @@ class Variables(Base):
     __tablename__ = 'variables'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    standard_name: Mapped[str] = mapped_column(String(50), nullable=False)
+    standard_name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     long_name: Mapped[str] = mapped_column(String(200))
     units: Mapped[str] = mapped_column(String(40), nullable=False)
 

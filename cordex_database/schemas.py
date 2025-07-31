@@ -1,10 +1,10 @@
-__version__='0.1.6'
+__version__='0.1.7'
 __author__=['Ioannis Tsakmakis']
 __date_created__='2025-06-30'
-__last_updated__='2025-07-28'
+__last_updated__='2025-07-30'
 
 from pydantic import BaseModel, condecimal
-from databases_companion.enum_variables import AccountType, AggregationFunction, TemporalResolution
+from databases_companion.enum_variables import AccountType, AggregationFunction, TemporalResolution, ConfirmationStatus
 from typing import Annotated, Optional
 from decimal import Decimal
 from datetime import datetime
@@ -14,6 +14,7 @@ from datetime import datetime
 class UsersBase(BaseModel):
     aws_user_name: str
     email: str
+    confirmation_status: ConfirmationStatus
     account_type: AccountType
     subscription_expires_in: datetime
 
@@ -42,7 +43,7 @@ class DataProductsBase(BaseModel):
     short_name: str
     aggregation_function: AggregationFunction
     temporal_resolution: TemporalResolution
-    spatial_resulution: Optional[str] = None
+    spatial_resolution: Optional[str] = None
 
 class DataMappingBase(BaseModel):
     projection_id: int

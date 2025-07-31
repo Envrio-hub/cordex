@@ -1,15 +1,15 @@
-__version__='0.1.5'
+__version__='0.1.7'
 __author__=['Ioannis Tsakmakis']
 __date_created__='2025-06-30'
-__last_updated__='2025-07-28'
+__last_updated__='2025-07-31'
 
 from cordex_database import models, schemas, engine
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlalchemy import select, update
 from geoalchemy2.functions import ST_GeomFromText, ST_Distance_Sphere
 from aws_utils.aws_utils import KeyManagementService
 from databases_companion.decorators import DatabaseDecorators, DTypeValidator
-from databases_companion.enum_variables import TemporalResolution, AggregationFunction
+from databases_companion.enum_variables import TemporalResolution, AggregationFunction, ConfirmationStatus
 
 data_base_decorators = DatabaseDecorators(SessionLocal=engine.SessionLocal, Session=Session)
 data_type_validator = DTypeValidator()
@@ -19,7 +19,8 @@ class User:
     @staticmethod
     @data_base_decorators.session_handler_add_delete_update
     def add(new_user: schemas.UsersCreate, db: Session = None):
-        new_user = models.Users(aws_user_name=new_user.aws_user_name, email=new_user.email, account_type=new_user.account_type, subscription_expires_in=new_user.subscription_expires_in)
+        new_user = models.Users(aws_user_name=new_user.aws_user_name, email=new_user.email, confirmation_status=new_user.confirmation_status,
+                                account_type=new_user.account_type, subscription_expires_in=new_user.subscription_expires_in)
         db.add(new_user)
     
     @staticmethod
@@ -29,16 +30,16 @@ class User:
         return db.execute(select(models.Users).filter_by(aws_user_name=name)).scalar()
     
     @staticmethod
-    @data_type_validator.validate_int('user_id')
-    @data_base_decorators.session_handler_query
-    def get_by_name(user_id: int, db: Session = None):
-        return db.execute(select(models.Users).filter_by(id=user_id)).scalar()
-    
-    @staticmethod
     @data_type_validator.validate_str('email')
     @data_base_decorators.session_handler_query
     def get_by_email(email: str, db: Session = None):
         return db.execute(select(models.Users).filter_by(email=email)).scalar()
+    
+    @staticmethod
+    @data_base_decorators.session_handler_add_delete_update
+    @data_type_validator.validate_str('email')
+    def update_configuration_status_by_email(email: str, status: ConfirmationStatus, db: Session = None):
+        db.execute(update(models.Users).where(models.Users.email==email).values(configuration_status=status))
 
 class ProjectionAttributes():
 
@@ -73,6 +74,12 @@ class Locations:
     def add(new_location: schemas.LocationsCreate, db: Session = None):
         new_location = models.Locations(longitude=new_location.longitude, latitude=new_location.latitude, elevation=new_location.elevation, geom=ST_GeomFromText(f'POINT({new_location.longitude} {new_location.latitude})', 4326))
         db.add(new_location)
+
+    @staticmethod
+    @data_base_decorators.session_handler_query
+    @data_type_validator.validate_int('location_id')
+    def get_by_id(location_id: int, db: Session = None):
+        return db.execute(select(models.Locations).filter_by(id=location_id)).scalars().first()
 
     @staticmethod
     @data_type_validator.validate_decimal('longitude', 'latitude')
@@ -125,13 +132,13 @@ class Variables:
     @data_base_decorators.session_handler_query
     @data_type_validator.validate_str('standard_name')
     def get_by_standard_name(standard_name: str, db: Session = None):
-        return db.execute(select(models.Variables).filter_by(standard_name=standard_name)).scalars().all()
+        return db.execute(select(models.Variables).filter_by(standard_name=standard_name)).scalars().first()
     
     @staticmethod
     @data_base_decorators.session_handler_add_delete_update
     @data_type_validator.validate_str('standard_name')
     def delete_by_standard_name(standard_name: str, db: Session = None):
-        result = db.execute(select(models.Variables).filter_by(standard_name=standard_name)).scalars().all()
+        result = db.execute(select(models.Variables).filter_by(standard_name=standard_name)).scalars().first()
         if result:
             db.delete(result)
 
@@ -140,8 +147,8 @@ class DataProducts:
     @staticmethod
     @data_base_decorators.session_handler_add_delete_update
     def add(new_data_product: schemas.DataProductsCreate, db: Session = None):
-        new_data_product = models.DataProducts(variable_id=new_data_product.variable_id, short_name=new_data_product.short_name, aggretation_function=new_data_product.aggregation_function,
-                                               temporal_resolution=new_data_product.temporal_resolution, spatial_resolution=new_data_product.spatial_resulution)
+        new_data_product = models.DataProducts(variable_id=new_data_product.variable_id, short_name=new_data_product.short_name, aggregation_function=new_data_product.aggregation_function,
+                                               temporal_resolution=new_data_product.temporal_resolution, spatial_resolution=new_data_product.spatial_resolution)
         db.add(new_data_product)
 
     @staticmethod
@@ -163,7 +170,15 @@ class DataProducts:
     @staticmethod
     @data_base_decorators.session_handler_query
     @data_type_validator.validate_int('variable_id')
-    @data_type_validator.validate_str('short_name','spacial_resolution')
+    @data_type_validator.validate_str('short_name')
+    def get_by_variable_id_and_short_name(variable_id: int, short_name: str, db: Session = None):
+        return db.execute(select(models.DataProducts).filter(models.DataProducts.variable_id==variable_id,
+                                                             models.DataProducts.short_name==short_name)).scalars().first()
+    
+    @staticmethod
+    @data_base_decorators.session_handler_query
+    @data_type_validator.validate_int('variable_id')
+    @data_type_validator.validate_str('short_name','spatial_resolution')
     def get_by_all(variable_id: int, short_name: str, aggregation_function: AggregationFunction, temporal_resolution:TemporalResolution, spatial_resolution: str, db: Session = None):
         return db.execute(select(models.DataProducts).filter(models.DataProducts.variable_id==variable_id,
                                                             models.DataProducts.short_name==short_name,
@@ -192,21 +207,19 @@ class DataMapping:
     
     @staticmethod
     @data_base_decorators.session_handler_query
-    @data_type_validator.validate_str('standard_name')
-    def get_by_standard_name(standard_name: str, db: Session = None):
-        variable_id = db.execute(select(models.Variables).filter_by(standard_name=standard_name)).scalars()
-        return db.execute(select(models.DataMapping).filter_by(variable_id=variable_id)).scalars()
-    
-    @staticmethod
-    @data_base_decorators.session_handler_query
     @data_type_validator.validate_int('projection_id','location_id','data_product_id')
     def get_by_location_projection_variable_id(projection_id: int, location_id: int, data_product_id: int, db: Session = None):
-        result = db.execute(select(models.DataMapping).filter(models.DataMapping.location_id==location_id,
-                                                              models.DataMapping.projection_id==projection_id,
-                                                              models.DataMapping.data_product_id==data_product_id)).scalars().first()
-        if result:
-            return result
-        return None
+        return db.execute(select(models.DataMapping).filter(models.DataMapping.location_id==location_id,
+                                                            models.DataMapping.projection_id==projection_id,
+                                                            models.DataMapping.data_product_id==data_product_id)).scalars().first()
+
+
+    @staticmethod
+    @data_base_decorators.session_handler_query
+    @data_type_validator.validate_int('projection_id','data_product_id')
+    def get_by_projection_and_data_product_id(projection_id: int, data_product_id: int, db: Session = None):
+        return db.execute(select(models.DataMapping).filter(models.DataMapping.projection_id==projection_id,
+                                                            models.DataMapping.data_product_id==data_product_id)).scalars().all()
 
     @staticmethod
     @data_base_decorators.session_handler_query
