@@ -1,7 +1,7 @@
-__version__='0.1.7'
+__version__='0.1.8'
 __author__=['Ioannis Tsakmakis']
 __date_created__='2025-06-30'
-__last_updated__='2025-07-31'
+__last_updated__='2025-08-01'
 
 from cordex_database import models, schemas, engine
 from sqlalchemy.orm import Session
@@ -10,6 +10,7 @@ from geoalchemy2.functions import ST_GeomFromText, ST_Distance_Sphere
 from aws_utils.aws_utils import KeyManagementService
 from databases_companion.decorators import DatabaseDecorators, DTypeValidator
 from databases_companion.enum_variables import TemporalResolution, AggregationFunction, ConfirmationStatus
+import os
 
 data_base_decorators = DatabaseDecorators(SessionLocal=engine.SessionLocal, Session=Session)
 data_type_validator = DTypeValidator()
@@ -19,27 +20,32 @@ class User:
     @staticmethod
     @data_base_decorators.session_handler_add_delete_update
     def add(new_user: schemas.UsersCreate, db: Session = None):
-        new_user = models.Users(aws_user_name=new_user.aws_user_name, email=new_user.email, confirmation_status=new_user.confirmation_status,
+        enc_user_sub = KeyManagementService().encrypt_data(new_user.user_sub, key_id=os.getenv('key_management_service_key'))
+        enc_email = KeyManagementService().encrypt_data(new_user.email, key_id=os.getenv('key_management_service_key'))
+        new_user = models.Users(user_sub=enc_user_sub, email=enc_email, confirmation_status=new_user.confirmation_status,
                                 account_type=new_user.account_type, subscription_expires_in=new_user.subscription_expires_in)
         db.add(new_user)
     
     @staticmethod
-    @data_type_validator.validate_str('aws_user_name')
+    @data_type_validator.validate_str('user_sub')
     @data_base_decorators.session_handler_query
-    def get_by_name(name: str, db: Session = None):
-        return db.execute(select(models.Users).filter_by(aws_user_name=name)).scalar()
+    def get_by_user_sub(user_sub: str, db: Session = None):
+        enc_user_sub = KeyManagementService().encrypt_data(user_sub, key_id=os.getenv('key_management_service_key'))
+        return db.execute(select(models.Users).filter_by(user_sub=enc_user_sub)).scalar()
     
     @staticmethod
     @data_type_validator.validate_str('email')
     @data_base_decorators.session_handler_query
     def get_by_email(email: str, db: Session = None):
-        return db.execute(select(models.Users).filter_by(email=email)).scalar()
+        enc_email = KeyManagementService().encrypt_data(email, key_id=os.getenv('key_management_service_key'))
+        return db.execute(select(models.Users).filter_by(email=enc_email)).scalar()
     
     @staticmethod
     @data_base_decorators.session_handler_add_delete_update
     @data_type_validator.validate_str('email')
     def update_configuration_status_by_email(email: str, status: ConfirmationStatus, db: Session = None):
-        db.execute(update(models.Users).where(models.Users.email==email).values(configuration_status=status))
+        enc_email = KeyManagementService().encrypt_data(email, key_id=os.getenv('key_management_service_key'))
+        db.execute(update(models.Users).where(models.Users.email==enc_email).values(configuration_status=status))
 
 class ProjectionAttributes():
 

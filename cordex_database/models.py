@@ -18,7 +18,7 @@ class Users(Base):
     __tablename__='users'
 
     user_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    aws_user_name: Mapped[str] = mapped_column(String(500), nullable=False)
+    user_sub: Mapped[str] = mapped_column(String(500), nullable=False)
     email: Mapped[str] = mapped_column(String(500), nullable=False)
     confirmation_status: Mapped[ConfirmationStatus] = mapped_column(SQLAlchemyEnum(ConfirmationStatus), nullable=False)
     account_type: Mapped[AccountType] = mapped_column(SQLAlchemyEnum(AccountType), nullable=False)

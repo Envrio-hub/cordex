@@ -12,7 +12,7 @@ from datetime import datetime
 
 # Base Models
 class UsersBase(BaseModel):
-    aws_user_name: str
+    user_sub: str
     email: str
     confirmation_status: ConfirmationStatus
     account_type: AccountType
