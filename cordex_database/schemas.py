@@ -1,7 +1,7 @@
-__version__='0.1.7'
+__version__='0.1.8'
 __author__=['Ioannis Tsakmakis']
 __date_created__='2025-06-30'
-__last_updated__='2025-07-30'
+__last_updated__='2025-08-01'
 
 from pydantic import BaseModel, condecimal
 from databases_companion.enum_variables import AccountType, AggregationFunction, TemporalResolution, ConfirmationStatus
@@ -13,6 +13,7 @@ from datetime import datetime
 # Base Models
 class UsersBase(BaseModel):
     user_sub: str
+    user_hash: str
     email: str
     confirmation_status: ConfirmationStatus
     account_type: AccountType

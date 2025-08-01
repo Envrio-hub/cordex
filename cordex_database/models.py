@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-__version__='0.1.8'
+__version__='0.1.9'
 __author__=['Ioannis Tsakmakis']
 __date_created__='2025-06-30'
-__last_updated__='2025-07-28'
+__last_updated__='2025-08-01'
 
 from cordex_database.engine import Base
 from sqlalchemy import Index, UniqueConstraint, ForeignKey, Integer, String, DateTime, Numeric, Enum as SQLAlchemyEnum
@@ -12,13 +12,13 @@ from geoalchemy2 import Geometry
 from databases_companion.enum_variables import AccountType, TemporalResolution, AggregationFunction, ConfirmationStatus
 from datetime import datetime
 
-
 # Users
 class Users(Base):
     __tablename__='users'
 
     user_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     user_sub: Mapped[str] = mapped_column(String(500), nullable=False)
+    user_hash: Mapped[str] = mapped_column(String(500), nullable=False)
     email: Mapped[str] = mapped_column(String(500), nullable=False)
     confirmation_status: Mapped[ConfirmationStatus] = mapped_column(SQLAlchemyEnum(ConfirmationStatus), nullable=False)
     account_type: Mapped[AccountType] = mapped_column(SQLAlchemyEnum(AccountType), nullable=False)

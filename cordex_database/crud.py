@@ -10,7 +10,7 @@ from geoalchemy2.functions import ST_GeomFromText, ST_Distance_Sphere
 from aws_utils.aws_utils import KeyManagementService
 from databases_companion.decorators import DatabaseDecorators, DTypeValidator
 from databases_companion.enum_variables import TemporalResolution, AggregationFunction, ConfirmationStatus
-import os
+import os, hashlib
 
 data_base_decorators = DatabaseDecorators(SessionLocal=engine.SessionLocal, Session=Session)
 data_type_validator = DTypeValidator()
@@ -21,8 +21,9 @@ class User:
     @data_base_decorators.session_handler_add_delete_update
     def add(new_user: schemas.UsersCreate, db: Session = None):
         enc_user_sub = KeyManagementService().encrypt_data(new_user.user_sub, key_id=os.getenv('key_management_service_key'))
-        enc_email = KeyManagementService().encrypt_data(new_user.email, key_id=os.getenv('key_management_service_key'))
-        new_user = models.Users(user_sub=enc_user_sub, email=enc_email, confirmation_status=new_user.confirmation_status,
+        user_sub_hash = hashlib.sha256(new_user.user_sub.encode()).hexdigest()
+        email_hash = hashlib.sha256(new_user.email.encode()).hexdigest()
+        new_user = models.Users(user_sub=enc_user_sub, user_hash=user_sub_hash, email=email_hash, confirmation_status=new_user.confirmation_status,
                                 account_type=new_user.account_type, subscription_expires_in=new_user.subscription_expires_in)
         db.add(new_user)
     
