@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from envrio_logger.logger import alchemy
 import os
 
+
 # Load environemntal variables
 load_dotenv()
 
