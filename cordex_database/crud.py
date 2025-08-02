@@ -1,7 +1,7 @@
-__version__='0.1.8'
+__version__='0.1.9'
 __author__=['Ioannis Tsakmakis']
 __date_created__='2025-06-30'
-__last_updated__='2025-08-01'
+__last_updated__='2025-08-02'
 
 from cordex_database import models, schemas, engine
 from sqlalchemy.orm import Session
@@ -35,7 +35,7 @@ class User:
     @data_base_decorators.session_handler_query
     def get_by_user_sub(user_sub: str, db: Session = None):
         user_sub_hash = hash_user_sub(user_sub)
-        return db.execute(select(models.Users).filter_by(user_sub=user_sub_hash)).scalar()
+        return db.execute(select(models.Users).filter_by(user_hash=user_sub_hash)).scalar()
     
     @staticmethod
     @data_type_validator.validate_str('email')
@@ -47,9 +47,9 @@ class User:
     @staticmethod
     @data_base_decorators.session_handler_add_delete_update
     @data_type_validator.validate_str('email')
-    def update_configuration_status_by_email(email: str, status: ConfirmationStatus, db: Session = None):
+    def update_confirmation_status_by_email(email: str, status: ConfirmationStatus, db: Session = None):
         email_hash = hash_user_sub(email)
-        db.execute(update(models.Users).where(models.Users.email==email_hash).values(configuration_status=status))
+        db.execute(update(models.Users).where(models.Users.email==email_hash).values(confirmation_status=status))
 
 class ProjectionAttributes():
 

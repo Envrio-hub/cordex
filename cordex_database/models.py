@@ -17,9 +17,9 @@ class Users(Base):
     __tablename__='users'
 
     user_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    user_sub: Mapped[str] = mapped_column(String(500), nullable=False)
-    user_hash: Mapped[str] = mapped_column(String(500), nullable=False)
-    email: Mapped[str] = mapped_column(String(500), nullable=False)
+    user_sub: Mapped[str] = mapped_column(String(500), nullable=False, unique=True)
+    user_hash: Mapped[str] = mapped_column(String(500), nullable=False, unique=True)
+    email: Mapped[str] = mapped_column(String(500), nullable=False, unique=True)
     confirmation_status: Mapped[ConfirmationStatus] = mapped_column(SQLAlchemyEnum(ConfirmationStatus), nullable=False)
     account_type: Mapped[AccountType] = mapped_column(SQLAlchemyEnum(AccountType), nullable=False)
     subscription_expires_in: Mapped[datetime] = mapped_column(DateTime, nullable=False)
