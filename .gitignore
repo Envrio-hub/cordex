@@ -1,7 +1,10 @@
 .gitignore
-alembic.ini
+
+cordex_database/__pycache__
+cordex_database/.env
+
+examples/
 
 migrations/
-examples/
-cordex_database/.env
-cordex_database/__pycache__
+
+alembic.ini
