@@ -39,7 +39,7 @@ class User:
     @data_base_decorators.session_handler_add_delete_update
     @data_type_validator.validate_str('email')
     def update_configuration_status_by_email(email: str, status: ConfirmationStatus, db: Session = None):
-        db.execute(update(models.Users).where(models.Users.email==email).values(configuration_status=status))
+        db.execute(update(models.Users).where(models.Users.email==email).values(confirmation_status=status))
 
 class ProjectionAttributes():
 
